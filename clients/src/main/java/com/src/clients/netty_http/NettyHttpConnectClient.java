@@ -159,11 +159,7 @@ public class NettyHttpConnectClient extends ConnectClient {
     }
 
 
-    public static void main(String[] args) throws Exception {
-        ConnectClient connectClient = new NettyHttpConnectClient();
-        connectClient.init("http://localhost:8888/api");
-        connectClient.send(new RpcRequest("66666"));
-    }
+
 
 
 }
