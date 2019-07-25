@@ -2,6 +2,7 @@ package com.src.clients.netty_http;
 
 import com.src.clients.common.ConnectClient;
 import com.src.clients.common.RpcRequest;
+import com.src.core.serialize.Serializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -36,9 +37,12 @@ public class NettyHttpConnectClient extends ConnectClient {
     private String address;
     private String host;
 
-    @Override
-    public void init(String address) throws Exception {
+    //加入序列化类型
+    private Serializer serializer;
 
+    @Override
+    public void init(String address,Serializer serializer) throws Exception {
+        this.serializer = serializer;
         if (!address.toLowerCase().startsWith("http")) {
             address = "http://" + address;	// IP:PORT, need parse to url
         }
@@ -62,7 +66,7 @@ public class NettyHttpConnectClient extends ConnectClient {
                                //添加HttpObjectAggregator解密器，其作用是将多个消息转换为单一的FullHttpRequest或者FullHttpResponse，
                                 //解码器在每个HTTP消息中会生成多个消息对象：有1、HttpRequest/HttpResponse;2、HttpContent；3、LastHttpContent；
                                 .addLast(new HttpObjectAggregator(5*1024*1024))
-                                .addLast(new NettyHttpClientHandler());
+                                .addLast(new NettyHttpClientHandler(serializer));
                     }
                 })
                 .option(ChannelOption.SO_KEEPALIVE, true);
@@ -79,9 +83,8 @@ public class NettyHttpConnectClient extends ConnectClient {
 
     @Override
     public void send(RpcRequest rpcRequest) throws Exception {
-        //TODO.. 选择序列化 类型；
-        byte[] requestBytes = ObjectToByte(rpcRequest);
-
+        //序列化
+        byte[] requestBytes = serializer.serialize(rpcRequest);
         DefaultFullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, new URI(address).getRawPath(), Unpooled.wrappedBuffer(requestBytes));
         request.headers().set(HttpHeaderNames.HOST, host);
         request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
@@ -109,57 +112,5 @@ public class NettyHttpConnectClient extends ConnectClient {
         }
         return false;
     }
-
-
-
-
-    private  byte[] ObjectToByte(Object obj) {
-        byte[] bytes = null;
-        try {
-            // object to bytearray
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            ObjectOutputStream oo = new ObjectOutputStream(bo);
-            oo.writeObject(obj);
-
-
-            bytes = bo.toByteArray();
-
-
-            bo.close();
-            oo.close();
-        } catch (Exception e) {
-            System.out.println("translation" + e.getMessage());
-            e.printStackTrace();
-        }
-        return bytes;
-    }
-
-
-    /**
-     * byte转对象
-     * @param bytes
-     * @return
-     */
-    private  Object ByteToObject(byte[] bytes) {
-        Object obj = null;
-        try {
-            // bytearray to object
-            ByteArrayInputStream bi = new ByteArrayInputStream(bytes);
-            ObjectInputStream oi = new ObjectInputStream(bi);
-
-
-            obj = oi.readObject();
-            bi.close();
-            oi.close();
-        } catch (Exception e) {
-            System.out.println("translation" + e.getMessage());
-            e.printStackTrace();
-        }
-        return obj;
-    }
-
-
-
-
 
 }

@@ -1,5 +1,6 @@
 package com.src.clients.common;
 
+import com.src.core.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ public  abstract class ConnectClient {
 
 
 
-    public abstract void init(String address) throws Exception;
+    public abstract void init(String address,Serializer serializer) throws Exception;
 
 
     //发起请求

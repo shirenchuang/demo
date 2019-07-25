@@ -1,5 +1,8 @@
 package com.src.clients.netty_http;
 
+import com.src.core.model.ReturnT;
+import com.src.core.model.RpcResponse;
+import com.src.core.serialize.Serializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +16,12 @@ import io.netty.handler.codec.http.FullHttpResponse;
  **/
 public class NettyHttpClientHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
 
+    private Serializer serializer;
+
+    NettyHttpClientHandler( Serializer serializer){
+        this.serializer = serializer;
+    }
+
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpResponse msg) throws Exception {
@@ -22,9 +31,14 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<FullHttp
         String rsp = new String(responseBytes,"UTF-8");
         System.out.println("收到回复啦："+rsp);
 
+        byte[] s = serializer.serialize(rsp);
+        String rpcResponse = (String) serializer.deserialize(s, String.class);
+
+        System.out.println("收到回复啦："+rpcResponse);
+
         //关闭连接
         //两个关闭的区别 https://emacsist.github.io/2018/04/27/%E7%BF%BB%E8%AF%91netty4%E4%B8%AD-ctx.close-%E4%B8%8E-ctx.channel.close-%E7%9A%84%E5%8C%BA%E5%88%AB/
-        ctx.channel().close();
+        //ctx.channel().close();
         //ctx.close();
 
     }
