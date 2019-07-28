@@ -1,5 +1,6 @@
-package com.src.clients.common;
+package com.src.core.remoting.common;
 
+import com.src.core.model.RpcRequest;
 import com.src.core.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

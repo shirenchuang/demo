@@ -1,9 +1,7 @@
-package com.src.clients.netty_http;
+package com.src.core.remoting.impl.netty_http.client;
 
-import com.src.core.model.ReturnT;
 import com.src.core.model.RpcResponse;
 import com.src.core.serialize.Serializer;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,12 +26,7 @@ public class NettyHttpClientHandler extends SimpleChannelInboundHandler<FullHttp
 
         System.out.println("收到回复啦："+msg.toString());
         byte[] responseBytes = ByteBufUtil.getBytes(msg.content());
-        String rsp = new String(responseBytes,"UTF-8");
-        System.out.println("收到回复啦："+rsp);
-
-        byte[] s = serializer.serialize(rsp);
-        String rpcResponse = (String) serializer.deserialize(s, String.class);
-
+        RpcResponse rpcResponse = (RpcResponse) serializer.deserialize(responseBytes, RpcResponse.class);
         System.out.println("收到回复啦："+rpcResponse);
 
         //关闭连接

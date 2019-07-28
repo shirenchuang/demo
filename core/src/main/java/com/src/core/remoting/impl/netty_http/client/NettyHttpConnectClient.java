@@ -1,7 +1,7 @@
-package com.src.clients.netty_http;
+package com.src.core.remoting.impl.netty_http.client;
 
-import com.src.clients.common.ConnectClient;
-import com.src.clients.common.RpcRequest;
+import com.src.core.model.RpcRequest;
+import com.src.core.remoting.common.ConnectClient;
 import com.src.core.serialize.Serializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -15,10 +15,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.timeout.IdleStateHandler;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +74,7 @@ public class NettyHttpConnectClient extends ConnectClient {
             return;
         }
 
-        logger.debug(">>>>>>>>>>> netty client proxy, connect to server success at host:{}, port:{}", host, port);
+        ConnectClient.logger.debug(">>>>>>>>>>> netty client proxy, connect to server success at host:{}, port:{}", host, port);
     }
 
     @Override
@@ -102,7 +98,7 @@ public class NettyHttpConnectClient extends ConnectClient {
         if (this.group!=null && !this.group.isShutdown()) {
             this.group.shutdownGracefully();
         }
-        logger.debug(">>>>>>>>>>>  netty client close.");
+        ConnectClient.logger.debug(">>>>>>>>>>>  netty client close.");
     }
 
     @Override
